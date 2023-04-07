@@ -1,0 +1,24 @@
+name: "Test: push a package to ghcr.io by using oras-cli in workflow"
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - "**"
+  #     - "!main"
+  #   tags:
+  #     - "!v*"
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install oras-cli
+        run: ./scripts/install-oras.sh
+
+      - name: Push a package to ghcr.io
+        run: ./scripts/multi_platforms.sh
+        env:
+          MY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
