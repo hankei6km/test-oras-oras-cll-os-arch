@@ -1,0 +1,36 @@
+name: "Test: copy a package from ghcr.io to local"
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - "**"
+  #     - "!main"
+  #   tags:
+  #     - "!v*"
+
+jobs:
+  push:
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      matrix:
+        platform:
+          - runner: ubuntu-latest
+          - runner: macos-latest
+    permissions:
+      packages: read
+    steps:
+      - uses: actions/checkout@v3
+      - name: Isntall skopeo
+        run: |
+          if [ "${RUNNER}" == "ubuntu-latest" ]; then
+            # ubuntu-latest(20.04) では skoppeo へインストールされている
+            sudo apt-get update
+            sudo apt-get install -y skopeo
+          elif [ "${RUNNER}" == "macos-latest" ]; then
+            brew update
+            brew install skopeo
+          fi
+        env:
+          RUNNER: ${{ matrix.platform.runner }}
+      - name: Copy a package for current platform
+        run: ./scripts/copy-for-platform.sh
